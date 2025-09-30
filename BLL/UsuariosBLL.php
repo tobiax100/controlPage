@@ -1,62 +1,49 @@
 <?php
 require_once("../Entidades/Usuario.php");
 require_once("../DAL/UsuarioDAL.php");
+
+
 class UsuariosBLL
 {
-    public function DeleteUser($idUsuario)
+    public function DeleteUser(int $idUsuario): bool
     {
         $usuarioDAL = new UsuarioDAL();
-        $delete = $usuarioDAL->DeleteUser($idUsuario);
-        return $delete;
+        return $usuarioDAL->DeleteUser($idUsuario);
     }
-    public function AuthUsuario($nombreUsuario, $contrasena): ?Usuario
+
+    public function AuthUsuario(string $nombreUsuario, string $contrasena): ?Usuario
     {
         $usuarioDAL = new UsuarioDAL();
         $usuario = $usuarioDAL->AuthUsuario($nombreUsuario, $contrasena);
-
-        if ($usuario != null) {
-            return $usuario;
-        }
-        if ($usuario === null) {
-            return null;
-        }
+        return $usuario; // devuelve null si no existe
     }
 
-    public function GrabarUsuario($usuario)
+    public function GrabarUsuario(Usuario $usuario): int
     {
         $usuarioDAL = new UsuarioDAL();
-        $id = $usuarioDAL->InsertarUsuario($usuario);
-        return $id;
+        return $usuarioDAL->InsertarUsuario($usuario);
     }
 
-    public function UpdateUsuario($usuario)
+    public function UpdateUsuario(Usuario $usuario): bool
     {
         $usuarioDAL = new UsuarioDAL();
-        $id = $usuarioDAL->UpdateUser($usuario);
-        return $id;
+        return $usuarioDAL->UpdateUser($usuario);
     }
 
     public static function ListaAlumnos(): array
     {
         $usuarioDAL = new UsuarioDAL();
-        $lista = $usuarioDAL->getAllUsuarios();
-        return $lista;
+        return $usuarioDAL->getAllUsuarios();
     }
 
-    public static function obtenerCursos($idUsuario): array
+    public static function obtenerCursos(int $idUsuario): array
     {
-        $cursos = CursoBLL::getCursosByIdPreceptor($idUsuario); // Llamada al método estático
-        return $cursos;
+        return CursoBLL::getCursosByIdPreceptor($idUsuario);
     }
 
-
-    public static function getUsuarioByIdCurso($idUsuario)
+    public static function getCursoByUsuario(int $idUsuario)
     {
-        $usuarioDAL= new UsuarioDAL();
-        $resultado= $usuarioDAL->getCursoById($idUsuario);
-        return $resultado;
+        $usuarioDAL = new UsuarioDAL();
+        return $usuarioDAL->getCursoById($idUsuario);
     }
-
-
-
 }

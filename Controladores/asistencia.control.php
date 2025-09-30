@@ -25,6 +25,20 @@ $tipoClase = isset($_POST["tipoClase"]) ? (array) $_POST["tipoClase"] : [];
 $listaAsistencias = array_intersect($listaId, $listaInasistencias);
 $inasistencias = array_diff($listaInasistencias, $listaId);
 // Grabar las asistencias con valor 0 (presente en taller o teoría)
+
+// Verificar si no se marcó ningún alumno
+if (empty($listaId) && empty($listaInasistencias)) {
+    foreach ($tipoClase as $clase) {
+        // -1 para indicar "sin alumnos"
+        $asistenciaBLL->grabarAsistencia("sin alumnos", -1, $clase);
+    }
+
+    $_SESSION['mensaje'] = "Se grabó asistencia: sin alumnos presentes";
+    header('Location: ../UI/preceptor.php');
+    exit();
+}
+
+
 foreach ($listaAsistencias as $asistencia) {
     foreach ($tipoClase as $clase) {
         // Determinar el valor de asistencia según tipo de clase

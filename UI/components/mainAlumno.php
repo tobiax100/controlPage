@@ -195,7 +195,7 @@ class Main_template
     
     private function formEdit($alumno)
     {
-        $tutor = TutorBLL::findTutorByIdAlumno($alumno->getIdTutor());
+        $tutor = TutorBLL::findTutorByIdAlumno($alumno->getId());
 // Convertir la fecha al formato correcto si no está en 'YYYY-MM-DD'
 $fechaNacimiento = date('Y-m-d', strtotime($alumno->getFechaNacimiento()));
 

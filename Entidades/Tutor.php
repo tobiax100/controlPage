@@ -7,8 +7,8 @@ class Tutor
     private string $apellido;
     private string $dni;
     private string $email;
-
     private string $telefono;
+    
     public function __construct(int $id, string $nombre, string $apellido, string $dni, string $email, string $telefono)
     {
         $this->id = $id;

@@ -4,7 +4,6 @@ require_once("AbstractMapper.php");
 class AsistenciaDAL extends AbstractMapper
 {
 
-
     //metodo que recibe los parametros de una asistencia y los inserta en la base de datos 
     public function insertarAsistencia($asistencia, $idAlumno,$fechaActual,$tipo)
     {
@@ -54,4 +53,22 @@ class AsistenciaDAL extends AbstractMapper
         );
         return $asistencia;
     }
+
+    public function insertarSinAlumnos($mensaje, $fechaActual, $tipo)
+{
+    $consulta = "INSERT INTO Asistencias (FechaAsistencia, ValorAsistencia, idAlumnos, idTipoClase)
+                 VALUES (
+                    '$fechaActual',
+                    '$mensaje', 
+                    NULL,      -- no hay alumno
+                    '$tipo'
+                 )";
+
+    $this->setConsulta($consulta);
+    $id = $this->Execute();
+    return $id;
 }
+
+}
+
+?>

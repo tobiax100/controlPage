@@ -35,4 +35,18 @@ class AsistenciaBLL
         $resultado= $asistenciaDAL->deleteAsistencias($idAlumno);
         return $resultado;
     }
+
+    //metodo dedicado para cuando no asiste nadie
+    public function grabarSinAlumnos($mensaje, $tipo)
+{
+    $fechaActual = $this->getFechaActual();
+    $asistenciaDAL = new AsistenciaDAL();
+    $asistencia = $asistenciaDAL->insertarSinAlumnos($mensaje, $fechaActual, $tipo);
+    return $asistencia;
 }
+
+
+
+}
+
+?>

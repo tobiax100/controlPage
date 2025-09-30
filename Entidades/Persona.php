@@ -10,8 +10,9 @@ class Persona
     private int $edad;
     private string $nacionalidad;
     private DateTime $fechaNacimiento;
+    // private string $userName;
 
-    public function __construct(int $id, string $nombre, string $apellido, string $dni, string $direccion, int $edad, string $nacionalidad, DateTime $fechaNacimiento)
+    public function __construct(int $id, string $nombre, string $apellido, string $dni, string $direccion, int $edad, string $nacionalidad, DateTime $fechaNacimiento,)
     {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -21,8 +22,15 @@ class Persona
         $this->edad = $edad;
         $this->nacionalidad = $nacionalidad;
         $this->fechaNacimiento = $fechaNacimiento;
+        // $this->userName = $userName;
+
     }
 
+
+
+
+
+    
     /**
      * Get the value of id
      */
@@ -166,4 +174,23 @@ class Persona
 
         return $this;
     }
+
+
+     /**
+         * Get the value of userName
+         */
+        // public function getUserName()
+        // {
+        //         return $this->userName;
+        // }
+
+        /**
+         * Set the value of userName
+         */
+        // public function setUserName($userName): self
+        // {
+        //         $this->userName = $userName;
+
+        //         return $this;
+        // }
 }

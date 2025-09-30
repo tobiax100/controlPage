@@ -1,4 +1,7 @@
 <?php
+
+use const Dom\STRING_SIZE_ERR;
+
 require_once("../Entidades/Usuario.php");
 require_once("../BLL/UsuariosBLL.php");
 
@@ -23,6 +26,10 @@ if (isset($_POST["contrasena"])) {
     $contrasena = (string) $_POST["contrasena"];
 }
 
+if(isset($_POST["userName"])){
+    $userName=(string) $_POST["userName"];
+}
+
 
 if (isset($_POST["idTipo"])) {
     $idTipoUsuario = (int) $_POST["idTipo"];
@@ -35,6 +42,7 @@ $usuario = new Usuario(
     $contrasena,
     $nombre,
     $apellido,
+    $userName,
     $idTipoUsuario
 );
 $usuarioBLL = new UsuariosBLL();

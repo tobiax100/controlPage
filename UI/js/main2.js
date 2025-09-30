@@ -11,3 +11,5 @@ function vista() {
         contador = true;
     }
 }
+
+//estilos paswword login

@@ -6,12 +6,15 @@ class UsuarioDAL extends AbstractMapper
 {
 
     //metodo que recibe un parametro de tipo usuario, busca y actualiza un fila de la tabala usuarios 
+
+    //aca hice cambio de username 
     public function UpdateUser($usuario)
     {
         $consulta="UPDATE usuarios 
         SET DNI='" . $usuario->getDni() . "',
             Email='".$usuario->getEmail()."',
             Contrasena='".$usuario->getContrasena()."',
+            userName='".$usuario->getUserName()."',
             Nombre='".$usuario->getNombre()."',
             Apellido='".$usuario->getApellido()."',
             idTiposUsuarios='".$usuario->getIdTiposUsuarios()."'
@@ -36,12 +39,13 @@ class UsuarioDAL extends AbstractMapper
     //Metodo que recibe un parametro de tipo usuario y graba en la db 
     public function InsertarUsuario($usuario)
     {
-        $consulta= "INSERT INTO usuarios(DNI,Email,Contrasena,Nombre,Apellido,idTiposUsuarios) VALUES
+        $consulta= "INSERT INTO usuarios(DNI,Email,Contrasena,Nombre,Apellido,userName,idTiposUsuarios) VALUES
         ('".$usuario->getDni()."',
         '".$usuario->getEmail()."',
         '".$usuario->getContrasena()."',
         '".$usuario->getNombre()."',
         '".$usuario->getApellido()."',
+        '".$usuario->getUserName()."',
         '".$usuario->getIdTiposUsuarios()."'
         )
         ";
@@ -50,19 +54,24 @@ class UsuarioDAL extends AbstractMapper
         $id= $this->Execute();
         return $id;
     }
-    //Metodo para buscar un  objetos tipo usuario, recibe dos parametros y mediante esos los busca en la base de datos 
+    //Metodo para buscar un  objetos tipo usuario
 
-    public function AuthUsuario($nombreUsuario, $contrasena): ?Usuario  
-    {
-        $consulta = "SELECT * FROM usuarios WHERE  Nombre='$nombreUsuario' AND Contrasena = '$contrasena'  ";
-        $this->setConsulta(consulta: $consulta);
-        $usuario = $this->Find();
-        if ($usuario instanceof  Usuario && $usuario != null) {
-            return $usuario;
-        }
+    public function AuthUsuario(string $nombreUsuario, string $contrasena): ?Usuario
+{
+    // se busca el usuario por su NOMBRE
+    $consulta = "SELECT * FROM usuarios WHERE UserName = '$nombreUsuario' LIMIT 1";
+    $this->setConsulta($consulta);
 
-        return null;    
+    // Ejecutamos Find() para obtener un objeto Usuario
+    $usuario = $this->Find();
+
+    // Verificamos que exista y que la contraseña coincida
+    if ($usuario instanceof Usuario && password_verify($contrasena, $usuario->getContrasena())) {
+        return $usuario; // autenticación correcta
     }
+
+    return null; 
+}
 
     //Metodo para recuperar un array de objetos tipo usuarios
     public function getAllUsuarios(): array
@@ -99,6 +108,7 @@ class UsuarioDAL extends AbstractMapper
         $contrasena = (string) $columna["Contrasena"];
         $nombre = (string) $columna["Nombre"];
         $apellido = (string) $columna["Apellido"];
+        $userName=(string) $columna["userName"];
         $idTipoUsuario= (int) $columna["idTiposUsuarios"]; 
         $usuario = new Usuario(
             $id,
@@ -107,8 +117,14 @@ class UsuarioDAL extends AbstractMapper
             $contrasena,
             $nombre,
             $apellido,
+            $userName,
             $idTipoUsuario
         );
         return $usuario;
     }
+
+
+
+    
 }
+

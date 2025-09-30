@@ -77,7 +77,7 @@ class Main_template
         return '
         <tr >
             <th scope="row">' . ($index + 1) . '</th>
-            <td>' . htmlspecialchars($usuario->getNombre()) . '</td>
+            <td>' . htmlspecialchars($usuario->getUserName()) . '</td>
             <td>' . htmlspecialchars($usuario->getApellido()) . '</td>
             <td>
                 <div class="d-flex justify-content-center gap-4">
@@ -154,6 +154,7 @@ class Main_template
                 <form id="addForm" method="POST" action="../Controladores/add.control.php">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
+                        //aca este el nombre que hay que cambiar
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>       
                     <div class="mb-3">
@@ -167,6 +168,10 @@ class Main_template
                     <div class="mb-3">
                         <label for="contrasena" class="form-label">Contraseña</label>
                         <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Nombre de Usuario</label>
+                        <input type="text" class="form-control" id="nombreDeUsuario" name="userName" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
@@ -203,7 +208,7 @@ class Main_template
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Nombre: ' . htmlspecialchars($usuario->getNombre()) . '</p>
+                        <p>Nombre de usuario: ' . htmlspecialchars($usuario->getUserName()) . '</p>
                         <p>Apellido: ' . htmlspecialchars($usuario->getApellido()) . '</p>
                         <p>DNI: ' . htmlspecialchars($usuario->getDni()) . '</p>
                         <p>Email: ' . htmlspecialchars($usuario->getEmail()) . '</p>
@@ -240,7 +245,7 @@ class Main_template
                         <input type="hidden" value="' . htmlspecialchars($usuario->getId()) . '" name="id">
                         <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" required value="' . $usuario->getNombre() . '">
+                                <input type="text" class="form-control" id="userName" name="userName" required value="' . $usuario->getUserName() . '">
                             </div>
                             <div class="mb-3">
                                 <label for="apellido" class="form-label">Apellido</label>

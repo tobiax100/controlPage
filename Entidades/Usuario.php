@@ -7,10 +7,21 @@ class Usuario
     private string $contrasena;
     private string $nombre;
     private string $apellido;
+    private string $userName;
     private string $idTiposUsuarios;
 
     
-public function __construct(int $id, string $dni, string $email, string $contrasena, string $nombre, string $apellido, string $idTiposUsuarios){$this->id = $id;$this->dni = $dni;$this->email = $email;$this->contrasena = $contrasena;$this->nombre = $nombre;$this->apellido = $apellido;$this->idTiposUsuarios = $idTiposUsuarios;}
+public function __construct(int $id, string $dni, string $email, string $contrasena, string $nombre, string $apellido, string $userName, string $idTiposUsuarios){
+    $this->id = $id;
+    $this->dni = $dni;
+    $this->email = $email;
+    $this->contrasena = $contrasena;
+    $this->nombre = $nombre;
+    $this->apellido = $apellido;
+    $this->userName = $userName;
+    $this->idTiposUsuarios = $idTiposUsuarios;
+     // Por compatibilidad con versiones anteriores
+}
 	
 
     /**
@@ -109,6 +120,23 @@ public function __construct(int $id, string $dni, string $email, string $contras
     public function getApellido(): string
     {
         return $this->apellido;
+    }
+
+    /**
+     * Get the value of userName
+     */
+    public function getUserName(): string
+    {
+        return $this->userName;
+    }
+
+    /**
+     * Set the value of userName
+     */
+    public function setUserName(string $userName): self
+    {
+        $this->userName = $userName;
+        return $this;
     }
 
     /**

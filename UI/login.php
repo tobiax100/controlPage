@@ -38,8 +38,8 @@
                   <i class="fas fa-user"></i>
                </div>
                <div class="div">
-                  <h5>Usuario</h5>
-                  <input type="text" class="input" name="usuario" id="usuario" required>
+                  <h5>Nombre de usuario</h5>
+                  <input type="text" class="input" name="usuario" id="usuario" placeholder="Ingrese su nombre de usuario" required>
                </div>
             </div>
             <div class="input-div pass">

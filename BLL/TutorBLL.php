@@ -11,12 +11,12 @@ class TutorBLL
         $id= $tutorDAL->InsertarTutor($tutor);
         return $id;
     }
-    public function getTutorByIdAlumno($idAlumno): Tutor
-    {
-        $tutorDAL= new TutorDAL();
-        $resultado= $tutorDAL->findTutorByIdAlumno($idAlumno);
-        return $resultado;
-    }
+    // public function getTutorByIdAlumno($idAlumno): Tutor
+    // {
+    //     $tutorDAL= new TutorDAL();
+    //     $resultado= $tutorDAL->findTutorByIdAlumno($idAlumno);
+    //     return $resultado;
+    // }
 
     public static function getAllTutor()
     {
@@ -33,12 +33,17 @@ class TutorBLL
         return $resultado;
     }
 
-    public static function findTutorByIdAlumno($idTutor):Tutor
-    {
-        $tutorDAL= new TutorDAL();
-        $resultado= $tutorDAL->findTutorByIdAlumno($idTutor);
-        return $resultado;
-    }
+    // public static function findTutorByIdAlumno($idAlumno):Tutor
+    // {
+    //     $tutorDAL= new TutorDAL();
+    //     $resultado= $tutorDAL->findTutorByIdAlumno($idAlumno);
+    //     return $resultado;
+    // }
 
+   public static function findTutorByIdAlumno(int $idAlumno): ?Tutor
+   {
+    $tutorDAL = new TutorDAL();
+    return $tutorDAL->findTutorByIdAlumno($idAlumno);
+   }
 
 }
