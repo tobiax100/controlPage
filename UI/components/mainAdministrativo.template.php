@@ -154,7 +154,6 @@ class Main_template
                 <form id="addForm" method="POST" action="../Controladores/add.control.php">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
-                        //aca este el nombre que hay que cambiar
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>       
                     <div class="mb-3">
@@ -245,6 +244,10 @@ class Main_template
                         <input type="hidden" value="' . htmlspecialchars($usuario->getId()) . '" name="id">
                         <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required value="' . $usuario->getNombre() . '">
+                            </div>
+                            <div class="mb-3">
+                                <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" id="userName" name="userName" required value="' . $usuario->getUserName() . '">
                             </div>
                             <div class="mb-3">

@@ -1,0 +1,239 @@
+<script>
+    new DataTable('#CursoAlumnos', {
+        layout: {
+            topStart: {
+                buttons: [{
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-outline-danger', // Usar clase de Bootstrap para el botón PDF
+                    text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM8.5 1.5V4a1 1 0 0 0 1 1h2.5L8.5 1.5zm-.5 6h-1v2h1v-2zm2.204 2.09a.5.5 0 0 0 .592-.806A2.996 2.996 0 0 0 8 6.25a2.996 2.996 0 0 0-2.795 1.534.5.5 0 0 0 .592.806A2.01 2.01 0 0 1 8 7.25c.77 0 1.459.44 1.794 1.09z"/></svg> PDF',
+                    filename: 'Reporte_Curso_Alumnos', // Nombre del archivo descargado (sin extensión)
+                    orientation: 'portrait', // Orientación: 'portrait' o 'landscape'
+                    pageSize: 'A4', // Tamaño de la página
+                    title: 'Reporte de Curso Alumnos', // Título del archivo
+                }]
+            }
+        },
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json' // Cargar el archivo de traducción en español con URL completa
+        },
+        searching: false, // Elimina el campo de búsqueda
+        paging: false, // Elimina la paginación
+        info: true // Mostrar información de la tabla
+    });
+
+
+
+    // <-- conserva tu DataTable('#CursoAlumnos', {...}) tal como lo tenías arriba -->
+
+$(document).ready(function () {
+
+    // Inicializa cada tabla de modal cuyo id empiece con "InformeIndividual"
+    $('table[id^="InformeIndividual"]').each(function () {
+        var tableNode = this;
+        // datos del modal (si existen)
+        var $modalContent = $(tableNode).closest('.modal-content');
+        var nombreAlumno = $modalContent.data('nombre') || '';
+        var apellidoAlumno = $modalContent.data('apellido') || '';
+        var dniAlumno = $modalContent.data('dni') || '';
+
+        // Inicializa DataTable (usa new DataTable(...) si ya lo venías usando)
+        var dt = new DataTable(tableNode, {
+            dom: '<"d-flex justify-content-between align-items-center mb-2"B>t<"d-flex justify-content-between mt-2"ip>',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    className: 'btn btn-success me-2',
+                    text: 'Excel',
+                    filename: 'Reporte_Asistencias_' + nombreAlumno + '_' + apellidoAlumno,
+                    title: 'Reporte de Asistencias de ' + nombreAlumno + ' ' + apellidoAlumno + ' (' + dniAlumno + ')',
+                    exportOptions: { columns: ':visible' }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-outline-danger me-2',
+                    text: 'PDF',
+                    filename: 'Reporte_Asistencias_' + nombreAlumno + '_' + apellidoAlumno,
+                    title: 'Reporte de Asistencias de ' + nombreAlumno + ' ' + apellidoAlumno + ' (' + dniAlumno + ')',
+                    orientation: 'portrait',
+                    pageSize: 'A4'
+                }
+            ],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json'
+            },
+            searching: false,
+            paging: true,
+            info: false,
+            initComplete: function () {
+                var api = this.api();
+                var $btnContainer = $(api.buttons().container());
+
+                // Si ya agregamos los filtros en esta tabla, salimos (evita duplicados)
+                if ($btnContainer.find('.filtros-fecha').length) return;
+
+                // Contenedor de filtros (clases en lugar de IDs)
+                var $filtros = $(`
+                    <div class="filtros-fecha d-flex align-items-center ms-3">
+                        <input type="date" class="fecha-desde form-control form-control-sm me-2" placeholder="Desde">
+                        <input type="date" class="fecha-hasta form-control form-control-sm me-2" placeholder="Hasta">
+                        <button type="button" class="btn-filtrar btn btn-primary btn-sm me-2">Filtrar</button>
+                        <button type="button" class="btn-limpiar btn btn-secondary btn-sm">Limpiar</button>
+                        <div class="mensaje-sin-registros text-muted ms-3" style="display:none;">No hay asistencias en el rango seleccionado.</div>
+                    </div>
+                `);
+
+                // Añadir los filtros justo junto a los botones de export
+                $btnContainer.append($filtros);
+
+                // Helper para quitar filtros anteriores añadidos por esta tabla
+                function quitarFiltrosDeEstaTabla() {
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(function (f) {
+                        return f._dtInstance !== api.table().node();
+                    });
+                }
+
+                // Evento Filtrar
+                $filtros.find('.btn-filtrar').on('click', function () {
+                    var desde = $filtros.find('.fecha-desde').val(); // 'YYYY-MM-DD' o ''
+                    var hasta = $filtros.find('.fecha-hasta').val();
+
+                    // Quitar filtros previos de esta tabla
+                    quitarFiltrosDeEstaTabla();
+
+                    if (desde || hasta) {
+                        // Nueva función de filtro (marca la función con _dtInstance para poder eliminarla luego)
+                        var filtroPorFecha = function (settings, data /* array de columnas */) {
+                            // Solo aplicar este filtro a la tabla correspondiente
+                            if (settings.nTable !== api.table().node()) return true;
+
+                            var fechaCell = data[0] || ''; // columna 0 (Fecha de asistencia)
+                            var fechaStr = fechaCell.toString().trim().split(' ')[0]; // 'YYYY-MM-DD'
+                            if (!fechaStr) return false; // si no hay fecha en la fila, no la mostramos
+
+                            var fechaNum = Date.parse(fechaStr);
+                            var desdeNum = desde ? Date.parse(desde) : null;
+                            var hastaNum = hasta ? Date.parse(hasta) : null;
+
+                            if (desdeNum && fechaNum < desdeNum) return false;
+                            if (hastaNum && fechaNum > hastaNum) return false;
+                            return true;
+                        };
+                        // marca para identificar la función
+                        filtroPorFecha._dtInstance = api.table().node();
+
+                        // agregar el filtro global
+                        $.fn.dataTable.ext.search.push(filtroPorFecha);
+                    }
+
+                    // Redibujar tabla
+                    api.draw();
+
+                    // Mostrar/ocultar mensaje
+                    if (api.rows({ filter: 'applied' }).data().length === 0) {
+                        $filtros.find('.mensaje-sin-registros').show();
+                    } else {
+                        $filtros.find('.mensaje-sin-registros').hide();
+                    }
+                });
+
+                // Evento Limpiar
+                $filtros.find('.btn-limpiar').on('click', function () {
+                    $filtros.find('.fecha-desde, .fecha-hasta').val('');
+                    quitarFiltrosDeEstaTabla();
+                    api.draw();
+                    $filtros.find('.mensaje-sin-registros').hide();
+                });
+            }
+        });
+    });
+
+});
+
+
+
+</script>
+
+
+
+
+
+
+
+
+ORIGINALLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+
+
+
+<script>
+    new DataTable('#CursoAlumnos', {
+        layout: {
+            topStart: {
+                buttons: [{
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-outline-danger', // Usar clase de Bootstrap para el botón PDF
+                    text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM8.5 1.5V4a1 1 0 0 0 1 1h2.5L8.5 1.5zm-.5 6h-1v2h1v-2zm2.204 2.09a.5.5 0 0 0 .592-.806A2.996 2.996 0 0 0 8 6.25a2.996 2.996 0 0 0-2.795 1.534.5.5 0 0 0 .592.806A2.01 2.01 0 0 1 8 7.25c.77 0 1.459.44 1.794 1.09z"/></svg> PDF',
+                    filename: 'Reporte_Curso_Alumnos', // Nombre del archivo descargado (sin extensión)
+                    orientation: 'portrait', // Orientación: 'portrait' o 'landscape'
+                    pageSize: 'A4', // Tamaño de la página
+                    title: 'Reporte de Curso Alumnos', // Título del archivo
+                }]
+            }
+        },
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json' // Cargar el archivo de traducción en español con URL completa
+        },
+        searching: false, // Elimina el campo de búsqueda
+        paging: false, // Elimina la paginación
+        info: true // Mostrar información de la tabla
+    });
+
+
+
+    $(document).ready(function() {
+    
+    $('table[id^="#InformeIndividual"]').each(function() {
+        var modalContent = $(this).closest('.modal-content');
+        var nombreAlumno = modalContent.data('nombre');  
+        var apellidoAlumno = modalContent.data('apellido'); 
+        var dniAlumno = modalContent.data('dni');  
+
+        new DataTable(this, {
+            dom: '<"d-flex justify-content-between mb-2"Bf>t<"d-flex justify-content-between mt-2"ip>', // Separar botones y búsqueda
+            buttons: [
+                {
+                    extend: 'excelHtml5', 
+                    className: 'btn btn-success', 
+                    text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel" viewBox="0 0 16 16"><path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5.707a1 1 0 0 0-.293-.707L10.707 0a1 1 0 0 0-.707-.293zM8 4V1h2v3H8zM3 1h2v3H3V1zm0 12V5h10v8H3z"/></svg> Excel',
+                    filename: 'Reporte_Asistencias_' + nombreAlumno + '_' + apellidoAlumno, // Nombre del archivo Excel con el nombre del alumno
+                    title: 'Reporte de Asistencias de ' + nombreAlumno + ' ' + apellidoAlumno + ' (' + dniAlumno + ')', // Título del reporte
+                    exportOptions: {
+                        columns: ':visible' // Exportar solo las columnas visibles
+                    }
+                },
+                {
+                        extend: 'pdfHtml5',
+                        className: 'btn btn-outline-danger',
+                        text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM8.5 1.5V4a1 1 0 0 0 1 1h2.5L8.5 1.5zm-.5 6h-1v2h1v-2zm2.204 2.09a.5.5 0 0 0 .592-.806A2.996 2.996 0 0 0 8 6.25a2.996 2.996 0 0 0-2.795 1.534.5.5 0 0 0 .592.806A2.01 2.01 0 0 1 8 7.25c.77 0 1.459.44 1.794 1.09z"/></svg> PDF',
+                        filename: 'Reporte_Asistencias_' + nombreAlumno + '_' + apellidoAlumno,
+                        title: 'Reporte de Asistencias de ' + nombreAlumno + ' ' + apellidoAlumno + ' (' + dniAlumno + ')',
+                        orientation: 'portrait',
+                        pageSize: 'A4'
+                    }
+            ],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json' 
+            },
+            searching: false,
+            info: false,
+            paging: true,
+            pagingType: 'simple_numbers', 
+            initComplete: function () {
+                // Usar clases de Bootstrap 5 para los botones de paginación
+                $('.dataTables_paginate .paginate_button').addClass('btn btn-outline-primary btn-sm');
+            }
+        });
+        
+    });
+});
+
+</script>

@@ -97,7 +97,7 @@ class Main_templateCursos
         $itemCurso = '';
 
         foreach ($listaCursos as $curso) {
-            $preceptor = UsuariosBLL::getUsuarioByIdCurso($curso->getIdUsuario());
+            $preceptor = UsuariosBLL::getCursoByUsuario($curso->getIdUsuario());
 
             if ($preceptor instanceof Usuario) {
                 $nombrePreceptor = htmlspecialchars($preceptor->getNombre()) . ' ' . htmlspecialchars($preceptor->getApellido());

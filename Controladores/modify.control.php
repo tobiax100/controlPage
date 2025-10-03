@@ -38,6 +38,11 @@ if (isset($_POST["idTipo"])) {
     $idTipoUsuario = (int) $_POST["idTipo"];
 }
 
+if(isset($_POST["userName"])){
+    $userName = $_POST["userName"];
+}
+
+
 $usuario= new Usuario(
     $id,
     $dni,
@@ -45,10 +50,11 @@ $usuario= new Usuario(
     $contrasena,
     $nombre,
     $apellido,
+    $userName,
     $idTipoUsuario
 );
 
 $usuarioBLL= new UsuariosBLL();
 $update= $usuarioBLL->UpdateUsuario($usuario);
 
-    header('Location: ../UI/administrador.php');
+header('Location: ../UI/administrador.php');
